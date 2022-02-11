@@ -19,6 +19,10 @@ module.exports = async (bot, msg,guildMap,connect,Discord) => {
     if(cmd=="!give_elder"){
         require('../cmds/give_elder')(bot,msg,args,argsF)
     }
+
+    if(cmd=="!test"){
+        require('../cmds/test_ls')(bot,msg,args,argsF)
+    }
    
     
         try {

@@ -31,10 +31,29 @@ module.exports = async (bot,message,args,argsF,Discord) => {
             
                message.channel.send("Авторизация прошла успешно ")
 
-               const embed = new Discord.MessageEmbed()
+               if(res[0].id_r==1){
+                const embed = new Discord.MessageEmbed()
+                .setColor('#22467d')
+                .setTitle('Студент')
+                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability")
+                return message.channel.send(embed);
+               }
+               if(res[0].id_r==2){
+                const embed = new Discord.MessageEmbed()
+                .setColor('#ff0000')
+                .setTitle('Староста')
+                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability\n!All_users\nGive_elder")
+                return message.channel.send(embed);
+               }
+               if(res[0].id_r==4){
+                const embed = new Discord.MessageEmbed()
                .setColor('#ff0000')
-               .setTitle('Error')
+               .setTitle('Преподователь')
+               .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability\n!All_users\nGive_elder")
                return message.channel.send(embed);
+               }
+
+               
 
             }
             else{
