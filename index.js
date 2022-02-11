@@ -1,19 +1,4 @@
-
-
-
-// con.query('SELECT * FROM `groups` WHERE `groups`.`name` =?',
-//     ["тип-71"], async (err,res,fields)=>{
-
-//         //Проверка на выполнение запроса
-//         if(err){
-//             console.log(err.message);
-            
-//             return console.log("biba");
-//         }})
-            
-          
-
-
+var con = require('./DB/conDb');
 
 //////////////////////////////////////////
 //////////////// LOGGING /////////////////
@@ -189,18 +174,23 @@ function speak_impl(voice_Connection, mapKey) {
             const duration = buffer.length / 48000 / 4;
             console.log("duration: " + duration)
 
-            if (SPEECH_METHOD === 'witai' || SPEECH_METHOD === 'google') {
-            if (duration < 1.0 || duration > 19) { // 20 seconds max dur
-                console.log("TOO SHORT / TOO LONG; SKPPING")
-                return;
-            }
-            }
+           
 
             try {
                 let new_buffer = await convert_audio(buffer)
                 let out = await transcribe(new_buffer, mapKey);
-                if (out != null)
+                if (out != null){
+                    
                     process_commands_query(out, mapKey, user);
+
+                    con.query('CALL `add_speach`(?, ?)',
+                    [user.id,out], async (err,fields)=>{
+                if(err)
+                   return console.log(err.message);
+                        
+                  })
+                   
+                }
             } catch (e) {
                 console.log('tmpraw rename: ' + e)
             }
@@ -214,6 +204,8 @@ function process_commands_query(txt, mapKey, user) {
     if (txt && txt.length) {
         let val = guildMap.get(mapKey);
         val.text_Channel.send(user.username + ': ' + txt)
+        
+       
     }
 }
 
@@ -235,48 +227,9 @@ async function transcribe(buffer, mapKey) {
   }
 }
 
-// WitAI
-let witAI_lastcallTS = null;
-const witClient = require('node-witai-speech');
-async function transcribe_witai(buffer) {
-    try {
-        // ensure we do not send more than one request per second
-        if (witAI_lastcallTS != null) {
-            let now = Math.floor(new Date());    
-            while (now - witAI_lastcallTS < 1000) {
-                console.log('sleep')
-                await sleep(100);
-                now = Math.floor(new Date());
-            }
-        }
-    } catch (e) {
-        console.log('transcribe_witai 837:' + e)
-    }
 
-    try {
-        console.log('transcribe_witai')
-        const extractSpeechIntent = util.promisify(witClient.extractSpeechIntent);
-        var stream = Readable.from(buffer);
-        const contenttype = "audio/raw;encoding=signed-integer;bits=16;rate=48k;endian=little"
-        const output = await extractSpeechIntent(WITAI_TOK, stream, contenttype)
-        witAI_lastcallTS = Math.floor(new Date());
-        console.log(output)
-        stream.destroy()
-        if (output && '_text' in output && output._text.length)
-            return output._text
-        if (output && 'text' in output && output.text.length)
-            return output.text
-        return output;
-    } catch (e) { console.log('transcribe_witai 851:' + e); console.log(e) }
-}
 
-// Google Speech API
-// https://cloud.google.com/docs/authentication/production
-const gspeech = require('@google-cloud/speech');
-const gspeechclient = new gspeech.SpeechClient({
-  projectId: 'discordbot',
-  keyFilename: 'gspeech_key.json'
-});
+
 
 async function transcribe_gspeech(buffer) {
   try {
