@@ -9,12 +9,12 @@ module.exports = async (bot, msg,guildMap,connect,Discord) => {
     if(cmd=="!auth"){
         require('../cmds/aut')(bot,msg,args,argsF,Discord)
     }
-   
-    
-    
- 
 
+    if(cmd=="!reg"){
+        require('../cmds/reg')(bot,msg,args,argsF)
+    }
    
+    
         try {
             if (!('guild' in msg) || !msg.guild) return; // prevent private messages to bot
             const mapKey = msg.guild.id;
