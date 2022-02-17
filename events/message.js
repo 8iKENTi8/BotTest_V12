@@ -1,3 +1,4 @@
+var con = require('../DB/conDb');
 module.exports = async (bot, msg,guildMap,connect,Discord) => {
 
     const msgAr = msg.content.toLowerCase().split(' '),
@@ -32,8 +33,28 @@ module.exports = async (bot, msg,guildMap,connect,Discord) => {
                 if (!msg.member.voice.channelID) {
                     msg.reply('Error: please join a voice channel first.')
                 } else {
-                    if (!guildMap.has(mapKey))
-                        await connect(msg, mapKey)
+                    if (!guildMap.has(mapKey)){
+
+                         con.query("INSERT INTO `records` (`id`, `speech`, `duration`) VALUES (NULL, '', '0.0')",
+                    [], async (err,fields)=>{
+                        if(err)
+                        return console.log(err.message);
+                                
+                        })
+
+                        con.query('SELECT `records`.`id` FROM `records` ORDER BY `records`.`id` DESC LIMIT 1',
+                        [], async (err,res,fields)=>{
+
+                        if(err)
+                            return console.log(err.message);
+
+                        if(res.length ==0)
+                            return console.log("Нету записей"); 
+
+                            await connect(msg, mapKey,res[0].id)
+
+                      })
+                        }
                     else
                         msg.reply('Already connected')
                 }

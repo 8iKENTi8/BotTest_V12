@@ -87,10 +87,6 @@ function loadConfig() {
 loadConfig()
 
 
-
-
-
-
 const Discord = require('discord.js')
 const DISCORD_MSG_LIMIT = 2000;
 const discordClient = new Discord.Client()
@@ -102,6 +98,61 @@ const guildMap = new Map();
 require('./events')(discordClient,guildMap,connect,Discord)
 
 
+function Dictionary(){
+    this.dataUser = []
+
+    this.add = function(key,value){
+        if(key &&value){
+            this.dataUser.push({
+                key: key,
+                value: value
+            })
+            return this.dataUser
+        }
+    }
+
+    this.findAt = function(key){
+        for (var i = 0; i < this.dataUser.length; i++) {
+            if(this.dataUser[i].key === key){
+                return this.dataUser[i].value
+            }
+            
+        }
+        return "Not found "
+    }
+
+    this.size = function () {
+        return this.dataUser.length
+    }
+
+}
+
+var dict = new Dictionary()
+
+function Select_dict(dict,callback) {
+    //  Проверка сушествует ли Фамилия и Имя студента
+ con.query('SELECT `users`.`id` , CONCAT(`students`.`lastname`," ",`students`.`firstname`) AS "FN" FROM `users`,`students` WHERE `users`.`id_s`=`students`.`id_s`',
+ [], async (err,res,fields)=>{
+
+     //Проверка на выполнение запроса
+     if(err){
+         console.log(err.message);
+         
+         return callback(0)
+     }
+         
+        if(res.length !=0) {
+           for (let i = 0; i < res.length; i++) {
+               
+               dict.add(res[i].id,res[i].FN)
+           }
+           return callback(dict)
+       }
+    }
+ )}
+
+
+
 const SILENCE_FRAME = Buffer.from([0xF8, 0xFF, 0xFE]);
 
 class Silence extends Readable {
@@ -111,7 +162,7 @@ class Silence extends Readable {
   }
 }
 
-async function connect(msg, mapKey) {
+async function connect(msg, mapKey,id_r) {
     try {
         let voice_Channel = await discordClient.channels.fetch(msg.member.voice.channelID);
         if (!voice_Channel) return msg.reply("Error: The voice channel does not exist!");
@@ -126,7 +177,7 @@ async function connect(msg, mapKey) {
             'selected_lang': 'ru',
             'debug': false,
         });
-        speak_impl(voice_Connection, mapKey)
+        speak_impl(voice_Connection, mapKey,id_r)
         voice_Connection.on('disconnect', async(e) => {
             if (e) console.log(e);
             guildMap.delete(mapKey);
@@ -154,7 +205,7 @@ if (SPEECH_METHOD === 'vosk') {
 }
 
 
-function speak_impl(voice_Connection, mapKey) {
+function speak_impl(voice_Connection, mapKey,id_r) {
     voice_Connection.on('speaking', async (user, speaking) => {
         if (speaking.bitfield == 0 || user.bot) {
             return
@@ -174,7 +225,7 @@ function speak_impl(voice_Connection, mapKey) {
             const duration = buffer.length / 48000 / 4;
             console.log("duration: " + duration)
 
-           
+           console.log(id_r);
 
             try {
                 let new_buffer = await convert_audio(buffer)
@@ -182,6 +233,19 @@ function speak_impl(voice_Connection, mapKey) {
                 if (out != null){
                     
                     process_commands_query(out, mapKey, user);
+
+                    Select_dict(dict,function (dict) {
+                        console.log(dict.findAt(user.id));
+
+                        con.query('CALL `add_rec`(?, ?)',
+                        [dict.findAt(user.id),id_r], async (err,fields)=>{
+                    if(err)
+                       return console.log(err.message);
+                            
+                      })
+                    })
+
+                  
 
                     con.query('CALL `add_speach`(?, ?)',
                     [user.id,out], async (err,fields)=>{
@@ -226,8 +290,6 @@ async function transcribe(buffer, mapKey) {
       return ret;
   }
 }
-
-
 
 
 
