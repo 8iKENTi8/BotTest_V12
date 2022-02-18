@@ -237,8 +237,8 @@ function speak_impl(voice_Connection, mapKey,id_r) {
                     Select_dict(dict,function (dict) {
                         console.log(dict.findAt(user.id));
 
-                        con.query('CALL `add_rec`(?, ?)',
-                        [dict.findAt(user.id),id_r], async (err,fields)=>{
+                        con.query('CALL `add_rec`(?, ?, ?, ?)',
+                        [dict.findAt(user.id),id_r,duration,out], async (err,fields)=>{
                     if(err)
                        return console.log(err.message);
                             
