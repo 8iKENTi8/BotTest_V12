@@ -2,12 +2,15 @@ var con = require('../DB/conDb');
 module.exports = async (msg,guildMap,connect) => {
 
     var user = msg.guild.members.cache.get(msg.author.id)
+    
 
     if(user.roles.cache.find(role => role.name == "Преподаватель") || user.roles.cache.find(role => role.name == "Староста")){
 
         try {
         if (!('guild' in msg) || !msg.guild) return; // prevent private messages to bot
         const mapKey = msg.guild.id;
+        global.Map_Key_global = mapKey
+        global.user_id = msg.author.id
         if (msg.content.trim().toLowerCase() == '!join') {
             if (!msg.member.voice.channelID) {
                 msg.reply('Error: please join a voice channel first.')
@@ -37,17 +40,10 @@ module.exports = async (msg,guildMap,connect) => {
                 else
                     msg.reply('Already connected')
             }
-        } else if (msg.content.trim().toLowerCase() == '!leave') {
-            if (guildMap.has(mapKey)) {
-                let val = guildMap.get(mapKey);
-                if (val.voice_Channel) val.voice_Channel.leave()
-                if (val.voice_Connection) val.voice_Connection.disconnect()
-                guildMap.delete(mapKey)
-                msg.reply("Disconnected.")
-            } else {
-                msg.reply("Cannot leave because not connected.")
-            }
-        }
+        } 
+        else if (msg.content.trim().toLowerCase() == '!leave') 
+            require('../global_fun/leave')(guildMap,mapKey,msg)
+        
 
      
     } catch (e) {
