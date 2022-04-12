@@ -226,7 +226,7 @@ function speak_impl(voice_Connection, mapKey,id_r) {
             const duration = buffer.length / 48000 / 4;
             console.log("duration: " + duration)
 
-           console.log(id_r);
+           
 
             try {
                 let new_buffer = await convert_audio(buffer)
@@ -236,14 +236,19 @@ function speak_impl(voice_Connection, mapKey,id_r) {
                     process_commands_query(out, mapKey, user);
 
                     Select_dict(dict,function (dict) {
-                        console.log(dict.findAt(user.id));
+                        
+                        if(out=="")
+                            con.query('CALL `add_rec_dur`(?, ?)',
+                            [duration,id_r], async (err,fields)=>{
 
-                        con.query('CALL `add_rec`(?, ?, ?, ?)',
-                        [dict.findAt(user.id),id_r,duration,out], async (err,fields)=>{
-                    if(err)
-                       return console.log(err.message);
-                            
-                      })
+                            if(err)
+                                return console.log(err.message);   })
+                        else
+                            con.query('CALL `add_rec`(?, ?, ?, ?)',
+                            [dict.findAt(user.id),id_r,duration,out], async (err,fields)=>{
+
+                                if(err)
+                                    return console.log(err.message); })
                     })
 
                   

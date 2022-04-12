@@ -31,20 +31,6 @@ module.exports = async (bot,message,args,argsF,Discord) => {
             
                message.channel.send("Авторизация прошла успешно ")
 
-               if(res[0].id_r==1){
-                const embed = new Discord.MessageEmbed()
-                .setColor('#22467d')
-                .setTitle('Студент')
-                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability")
-                return message.channel.send(embed);
-               }
-               if(res[0].id_r==2){
-                const embed = new Discord.MessageEmbed()
-                .setColor('#ff0000')
-                .setTitle('Староста')
-                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability\n!All_users\nGive_elder")
-                return message.channel.send(embed);
-               }
                if(res[0].id_r==4){
                 const embed = new Discord.MessageEmbed()
                .setColor('#ff0000')
@@ -52,8 +38,21 @@ module.exports = async (bot,message,args,argsF,Discord) => {
                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability\n!All_users\nGive_elder")
                return message.channel.send(embed);
                }
-
-               
+               if(res[0].id_r==2){
+                const embed = new Discord.MessageEmbed()
+                .setColor('#ff0000')
+                .setTitle('Староста')
+                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability\n!All_student")
+                return message.channel.send(embed);
+               }
+               if(res[0].id_r==1){
+                const embed = new Discord.MessageEmbed()
+                .setColor('#22467d')
+                .setTitle('Студент')
+                .setFooter("!My_appreciations\n!Mysuggestions\n!My_visitability")
+                return message.channel.send(embed);
+               }
+              
 
             }
             else{
