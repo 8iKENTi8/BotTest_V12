@@ -9,7 +9,7 @@ module.exports = async (bot,message,args,argsF) => {
     
     var user = message.guild.members.cache.get(message.author.id);
 
-    console.log(user.roles);
+   // console.log(user.roles);
 
     // 933467032291266610 преподоавтель
     // 931628294409945138 студент
@@ -197,7 +197,11 @@ module.exports = async (bot,message,args,argsF) => {
            
            return message.channel.send("Для изменения старосты необходимо повторить данную команду !give_elder `your_group` `your_lastname` `your_firstname`")
        }
-          UpdateRole()
+
+       if(res1[0].length>=3 && res1[1].length>3 && res1[2].length>3)
+            UpdateRole()
+        else
+            user.send("Недопустимая длина данных")
        }
        else{
         message.delete()

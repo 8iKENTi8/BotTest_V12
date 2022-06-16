@@ -49,7 +49,7 @@ module.exports = async (bot,message,args,argsF) => {
          }
              
             if(res.length ==0) {
-                console.log(res1[0],res1[1],res1[2]);
+               // console.log(res1[0],res1[1],res1[2]);
              message.channel.send("такого студента не существует ")
              return callback(0,false)
            }

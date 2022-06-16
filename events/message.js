@@ -39,6 +39,11 @@ module.exports = async (bot, msg,guildMap,connect,Discord) => {
             require('../cmds/students')(msg,Discord)
             return
         }
+
+        if(cmd=="!all_us"){
+            require('../cmds/all_us')(msg,Discord)
+            return
+        }
         
         user.send("Извините, такой команды не найдено или не существует " + cmd + ".")
     }
